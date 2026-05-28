@@ -1,5 +1,27 @@
 # Changelog
 
+## v1.1 (2026-05-29)
+
+### Kokoro Voice, Bluetooth Permission & Crash Fix
+
+**Kokoro BF Isabella TTS:**
+- Added 4th TTS option: Kokoro British Female (Isabella) — ~330 MB download
+- Uses `OfflineTtsKokoroModelConfig` from sherpa-onnx 1.13.2 AAR
+- Downloadable from `k2-fsa/sherpa-onnx` releases (kokoro-en-v0_19)
+- Falls back to system TTS if model not downloaded
+- Full integration: settings radio button, test button, model download card, greeting dispatch
+
+**Bluetooth Permission (Android 12+):**
+- Added `BLUETOOTH_CONNECT` permission to manifest
+- New `BluetoothStep` in setup wizard (auto-skipped on API < 31)
+- Runtime permission requested via `ActivityResultContracts.RequestPermission`
+- Required for `connectedDevice` foreground service type on Android 14+
+
+**Crash Fix (API 34+):**
+- Check `BLUETOOTH_CONNECT` permission before calling `startForegroundService()`
+- Wrapped `startForeground()` in try-catch `SecurityException` as safety net
+- Prevents instant crash on devices running Android 14+
+
 ## v1.0 (2026-05-28)
 
 ### First Stable Release

@@ -30,7 +30,7 @@
 
 <br>
 
-YourCarTalks is an Android app that plays **"Welcome to Your [car name]"** through your car's speakers every time you connect to **Android Auto**. Choose from system TTS or offline AI voices — male or female — and personalize every drive.
+YourCarTalks is an Android app that plays **"Welcome to Your [car name]"** through your car's speakers every time you connect to **Android Auto**. Choose from system TTS or offline AI voices — male, female, or British female (Isabella) — and personalize every drive.
 
 ---
 
@@ -61,7 +61,7 @@ Foreground service with minimal notification (only visible when connected to And
 <td width="50%">
 
 ### 🧠 Offline AI Voices
-Download Sherpa-ONNX TTS models for fully offline speech synthesis. Male and Female voices available.
+Download Sherpa-ONNX or Kokoro TTS models for fully offline speech synthesis. Male, Female, and British Female (Isabella) voices available.
 
 </td>
 </tr>
@@ -109,7 +109,7 @@ Automatically resumes after device reboot — set it and forget it.
                          ▼
 ┌─────────────────────────────────────────────────┐
 │     TTS speaks "Welcome to Your {car_name}"     │
-│   (System TTS / Sherpa-ONNX Male / Female)      │
+│   (System TTS / Sherpa-ONNX / Kokoro)           │
 └────────────────────────┬────────────────────────┘
                          │
                          ▼
@@ -128,8 +128,9 @@ Automatically resumes after device reboot — set it and forget it.
 | **System TTS** | No | Device-dependent | Uses your phone's built-in TTS engine (Google, Samsung, etc.) |
 | **Sherpa-ONNX Male** | Download once | High | Offline AI voice — English male. ~80 MB download |
 | **Sherpa-ONNX Female** | Download once | High | Offline AI voice — English female. ~80 MB download |
+| **Kokoro British Female** | Download once | High | Offline AI voice — English British female (Isabella). ~330 MB download |
 
-All three engines include a **Test** button in Settings so you can preview before driving.
+All four engines include a **Test** button in Settings so you can preview before driving.
 
 <br>
 
@@ -139,6 +140,7 @@ All three engines include a **Test** button in Settings so you can preview befor
 |---|---|
 | `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_CONNECTED_DEVICE` | Keep the connection monitor alive in the background |
 | `POST_NOTIFICATIONS` (Android 13+) | Foreground service notification (only while connected to AA) |
+| `BLUETOOTH_CONNECT` (Android 12+) | Required for `connectedDevice` foreground service type on Android 14+ |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Prevent the OS from killing the background service |
 | `RECEIVE_BOOT_COMPLETED` | Restart the service after device reboot |
 
@@ -172,8 +174,8 @@ adb install -r app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
 
 1. Open the app
 2. Enter your car's name
-3. Follow the setup wizard to grant permissions
-4. Choose your preferred TTS engine and theme
+3. Follow the setup wizard to grant permissions (battery, auto-start, notification, bluetooth)
+4. Choose your preferred theme and TTS engine
 5. That's it! Connect to Android Auto and hear your greeting 🎉
 
 <br>
