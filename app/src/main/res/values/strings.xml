@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">YourCarTalks</string>
+    <string name="welcome_title">Welcome to YourCarTalks</string>
+    <string name="car_name_label">Your Car\'s Name</string>
+    <string name="car_name_hint">e.g., Tesla, Prius, Mustang</string>
+    <string name="continue_btn">Continue</string>
+    <string name="setup_complete">Setup Complete!</string>
+    <string name="permission_battery_title">Disable Battery Optimization</string>
+    <string name="permission_battery_desc">YourCarTalks needs to run in the background to greet you when you connect to Android Auto. Battery optimization may prevent this.</string>
+    <string name="permission_autostart_title">Enable Auto-Start</string>
+    <string name="permission_autostart_desc">Some phones require apps to be granted auto-start permission to run in the background after reboot. Please enable it in your system settings.</string>
+    <string name="permission_notification_title">Notification Permission</string>
+    <string name="permission_notification_desc">YourCarTalks needs notification permission to keep a foreground service running for background monitoring.</string>
+    <string name="grant_permission">Grant Permission</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
+    <string name="service_channel_name">YourCarTalks Service</string>
+    <string name="service_channel_desc">Ongoing notification for Android Auto greeting service</string>
+    <string name="service_notification_text">Waiting for Android Auto connection…</string>
+    <string name="greeting_template">Welcome to Your %s</string>
+    <string name="settings_title">YourCarTalks Settings</string>
+    <string name="car_name_summary">Your car is called</string>
+    <string name="save">Save</string>
+    <string name="edit_car_name">Edit Car Name</string>
+    <string name="service_running">Service is running</string>
+    <string name="service_stopped">Service is stopped</string>
+</resources>

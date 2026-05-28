@@ -1,0 +1,52 @@
+# --- Android / Gradle ---
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+
+# --- App build outputs ---
+app/build/
+app/release/
+app/debug/
+
+# --- Keystore ---
+*.jks
+*.keystore
+*.ks
+key.properties
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# --- IDE ---
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.sublime-*
+
+# --- Kotlin ---
+*.kotlin_module
+
+# --- Misc ---
+*.log
+*.tmp
+*.bak
+local.properties

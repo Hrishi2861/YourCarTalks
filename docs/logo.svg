@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1B1B2F"/>
+      <stop offset="100%" style="stop-color:#16213E"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E94560"/>
+      <stop offset="100%" style="stop-color:#FF6B6B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="200" cy="200" r="195" fill="url(#bg)" stroke="url(#accent)" stroke-width="4"/>
+
+  <!-- Car silhouette -->
+  <g transform="translate(120, 150)">
+    <rect x="0" y="30" width="160" height="55" rx="12" fill="url(#accent)"/>
+    <rect x="25" y="10" width="110" height="30" rx="10" fill="url(#accent)" opacity="0.85"/>
+    <circle cx="40" cy="95" r="18" fill="#1B1B2F" stroke="url(#accent)" stroke-width="3"/>
+    <circle cx="120" cy="95" r="18" fill="#1B1B2F" stroke="url(#accent)" stroke-width="3"/>
+  </g>
+
+  <!-- Sound waves -->
+  <g transform="translate(200, 120)" fill="none" stroke="url(#accent)" stroke-width="3" stroke-linecap="round">
+    <path d="M20,20 Q5,0 20,-20" opacity="0.5"/>
+    <path d="M35,30 Q10,0 35,-30" opacity="0.65"/>
+    <path d="M50,40 Q15,0 50,-40" opacity="0.8"/>
+  </g>
+
+  <!-- Text -->
+  <text x="200" y="305" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="bold" fill="#FFFFFF">YourCarTalks</text>
+  <text x="200" y="335" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#8888AA" letter-spacing="3">GREETS YOU ON THE ROAD</text>
+</svg>
