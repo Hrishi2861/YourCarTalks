@@ -1,8 +1,69 @@
 # Changelog
 
+## v1.0 (2026-05-28)
+
+### First Stable Release
+
+**Multi-Engine TTS:**
+- System TTS (device's built-in speech engine)
+- Sherpa-ONNX Male — offline AI voice, ~80 MB download
+- Sherpa-ONNX Female — offline AI voice, ~80 MB download
+- Test button for each TTS engine in Settings — preview voices with your car name
+- Audio focus handling (`AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK`) for all engines
+
+**Model Download & Management:**
+- Download Sherpa-ONNX models directly from the app (tar.bz2 → auto-extract)
+- Live download progress with MB counter and progress bar
+- Extraction state shown with indeterminate progress indicator
+- Error handling with Retry option
+- LZMA + BZip2 extraction via Apache Commons Compress
+- Model cleanup on reinstall (old directory deleted before extraction)
+
+**Android Auto Detection:**
+- Projection mode support (`CarConnection.CONNECTION_TYPE_PROJECTION`)
+- Native Android Automotive support (`CarConnection.CONNECTION_TYPE_NATIVE`)
+- 2-second greeting delay for audio routing stability
+
+**Notification:**
+- Minimal notification — only visible when connected to Android Auto
+- Shows "Connected to Android Auto" during active connection
+- No persistent notification when idle (uses `stopForeground(STOP_FOREGROUND_REMOVE)`)
+- Foreground service resumes automatically on reconnect
+
+**Theme System:**
+- Light, Dark, and System-default theme modes
+- Explicit custom color schemes (dark: `#121212` background, `#1E1E1E` surfaces)
+- Window background and status bar icons sync with theme
+- Theme selection in both Setup Wizard and Settings
+
+**Settings Screen:**
+- Edit car name inline
+- TTS engine selection with radio buttons
+- Test button per engine
+- Model download card (shows when Sherpa engine selected and not downloaded)
+- Theme selector (System / Light / Dark)
+- Service status indicator
+
+**Setup Wizard:**
+- Car name input
+- Battery optimization disable request
+- Auto-start permission guide
+- Notification permission (Android 13+)
+- Theme selection step
+
+**Technical:**
+- Migrated to Jetpack Compose + Material 3 with explicit color schemes
+- Kotlin coroutines for async model download and extraction
+- `androidx.car.app` (CarConnection) for silent AA detection — no CarAppService, no AA launcher icon
+- `androidx.datastore` for preferences (car name, TTS method, theme mode)
+- `androidx.lifecycle:lifecycle-service` for lifecycle-aware foreground service
+- Sherpa-ONNX 1.13.2 for offline TTS
+- Apache Commons Compress 1.26.0 for archive extraction
+- Min SDK 29, Target SDK 34
+
 ## v0.1 (2026-05-28)
 
-### Initial Release
+### Initial Pre-release
 
 **Core features:**
 - Android Auto connection detection via `CarConnection` API (projection mode)

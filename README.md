@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin">
   </a>
   <a href="https://developer.android.com/studio">
-    <img src="https://img.shields.io/badge/Android-Jetpack%20Compose-3DDC84?logo=android&logoColor=white" alt="Android">
+    <img src="https://img.shields.io/badge/Android-Jetpack%20Compose-3DD84C?logo=android&logoColor=white" alt="Android">
   </a>
   <a href="https://developer.android.com/training/cars">
     <img src="https://img.shields.io/badge/Android%20Auto-Ready-E94560?logo=androidauto&logoColor=white" alt="Android Auto">
@@ -30,7 +30,7 @@
 
 <br>
 
-YourCarTalks is an Android app that plays **"Welcome to Your [car name]"** through your car's speakers every time you connect to **Android Auto**. Set your car's name once, and get a personalized greeting every drive.
+YourCarTalks is an Android app that plays **"Welcome to Your [car name]"** through your car's speakers every time you connect to **Android Auto**. Choose from system TTS or offline AI voices — male or female — and personalize every drive.
 
 ---
 
@@ -55,7 +55,21 @@ Uses Android Auto's `CarConnection` API. No icon appears in Android Auto's app d
 <td width="50%">
 
 ### 🔋 Battery Friendly
-Dedicated foreground service with low-importance notification. Won't get killed by the OS.
+Foreground service with minimal notification (only visible when connected to Android Auto). Won't get killed by the OS.
+
+</td>
+<td width="50%">
+
+### 🧠 Offline AI Voices
+Download Sherpa-ONNX TTS models for fully offline speech synthesis. Male and Female voices available.
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+### 🎨 Theme Support
+Choose between Light, Dark, or System-default theme. The app follows your preference across the UI.
 
 </td>
 <td width="50%">
@@ -73,36 +87,49 @@ Automatically resumes after device reboot — set it and forget it.
 
 ```
 ┌─────────────────────────────────────────────────┐
-│          Phone connects to Android Auto          │
-└────────────────────┬────────────────────────────┘
-                     │
-                     ▼
+│          Phone connects to Android Auto         │
+└────────────────────────┬────────────────────────┘
+                         │
+                         ▼
 ┌─────────────────────────────────────────────────┐
-│     CarConnection emits CONNECTION_TYPE_         │
-│               PROJECTION                         │
-└────────────────────┬────────────────────────────┘
-                     │
-                     ▼
+│     CarConnection emits CONNECTION_TYPE_        │
+│               PROJECTION                        │
+└────────────────────────┬────────────────────────┘
+                         │
+                         ▼
 ┌─────────────────────────────────────────────────┐
-│      GreetingService (foreground) detects it     │
-└────────────────────┬────────────────────────────┘
-                     │
-                     ▼
+│      GreetingService (foreground) detects it    │
+└────────────────────────┬────────────────────────┘
+                         │
+                         ▼
 ┌─────────────────────────────────────────────────┐
-│     2-second delay (audio routing stabilizes)    │
-└────────────────────┬────────────────────────────┘
-                     │
-                     ▼
+│     2-second delay (audio routing stabilizes)   │
+└────────────────────────┬────────────────────────┘
+                         │
+                         ▼
 ┌─────────────────────────────────────────────────┐
-│     TTS speaks "Welcome to Your {car_name}"      │
-└────────────────────┬────────────────────────────┘
-                     │
-                     ▼
+│     TTS speaks "Welcome to Your {car_name}"     │
+│   (System TTS / Sherpa-ONNX Male / Female)      │
+└────────────────────────┬────────────────────────┘
+                         │
+                         ▼
 ┌─────────────────────────────────────────────────┐
-│        Audio plays through car speakers          │
-│              ✦ Welcome to Your Tesla ✦           │
+│        Audio plays through car speakers         │
+│              ✦ Welcome to Your Tesla ✦          │
 └─────────────────────────────────────────────────┘
 ```
+
+<br>
+
+## 🎙️ TTS Engines
+
+| Engine | Online Required | Quality | Details |
+|--------|:-:|:-:|--------|
+| **System TTS** | No | Device-dependent | Uses your phone's built-in TTS engine (Google, Samsung, etc.) |
+| **Sherpa-ONNX Male** | Download once | High | Offline AI voice — English male. ~80 MB download |
+| **Sherpa-ONNX Female** | Download once | High | Offline AI voice — English female. ~80 MB download |
+
+All three engines include a **Test** button in Settings so you can preview before driving.
 
 <br>
 
@@ -111,7 +138,7 @@ Automatically resumes after device reboot — set it and forget it.
 | Permission | Purpose |
 |---|---|
 | `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_CONNECTED_DEVICE` | Keep the connection monitor alive in the background |
-| `POST_NOTIFICATIONS` (Android 13+) | Foreground service notification |
+| `POST_NOTIFICATIONS` (Android 13+) | Foreground service notification (only while connected to AA) |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | Prevent the OS from killing the background service |
 | `RECEIVE_BOOT_COMPLETED` | Restart the service after device reboot |
 
@@ -138,7 +165,7 @@ cd YourCarTalks
 ./gradlew assembleDebug
 
 # Install
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb install -r app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
 ```
 
 ### First Run
@@ -146,7 +173,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 1. Open the app
 2. Enter your car's name
 3. Follow the setup wizard to grant permissions
-4. That's it! Connect to Android Auto and hear your greeting 🎉
+4. Choose your preferred TTS engine and theme
+5. That's it! Connect to Android Auto and hear your greeting 🎉
 
 <br>
 
@@ -159,12 +187,13 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 | **Car API** | [`androidx.car.app:app`](https://developer.android.com/jetpack/androidx/releases/car-app) (CarConnection only) |
 | **Architecture** | Single-activity + Lifecycle-aware Foreground Service |
 | **Persistence** | [Jetpack DataStore](https://developer.android.com/topic/libraries/architecture/datastore) (Preferences) |
+| **Offline TTS** | [Sherpa-ONNX](https://github.com/k2-fsa/sherpa-onnx) |
 | **Min SDK** | API 29 (Android 10) |
 | **Target SDK** | API 34 |
 
 <br>
 
-## 📄 [License](License)
+## 📄 [License](LICENSE)
 
 ---
 

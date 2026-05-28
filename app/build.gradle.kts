@@ -15,6 +15,15 @@ android {
         versionName = "1.0"
     }
 
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("arm64-v8a", "armeabi-v7a")
+            isUniversalApk = false
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -58,4 +67,10 @@ dependencies {
     implementation("androidx.car.app:app:1.4.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // Sherpa-ONNX offline TTS
+    implementation(files("libs/sherpa-onnx-1.13.2.aar"))
+
+    // Bzip2/tar extraction for model download
+    implementation("org.apache.commons:commons-compress:1.26.0")
 }

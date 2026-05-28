@@ -25,23 +25,26 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.hrishi.yourcartalks.data.ThemeMode
 
 enum class SetupStep {
     CAR_NAME,
     BATTERY_OPT,
     AUTO_START,
     NOTIFICATION,
+    THEME,
     COMPLETE
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupScreen(
-    onComplete: (String) -> Unit
+    onComplete: (String, ThemeMode) -> Unit
 ) {
     val context = LocalContext.current
     var currentStep by remember { mutableStateOf(SetupStep.CAR_NAME) }
     var carName by remember { mutableStateOf("") }
+    var selectedTheme by remember { mutableStateOf(ThemeMode.SYSTEM) }
     var batteryOptDone by remember { mutableStateOf(false) }
     var notificationDone by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
@@ -100,7 +103,7 @@ fun SetupScreen(
                         SetupStep.NOTIFICATION
                     } else {
                         notificationDone = true
-                        SetupStep.COMPLETE
+                        SetupStep.THEME
                     }
                 }
             )
@@ -114,12 +117,18 @@ fun SetupScreen(
                         notificationDone = true
                     }
                 },
+                onNext = { currentStep = SetupStep.THEME }
+            )
+
+            SetupStep.THEME -> ThemeStep(
+                selectedTheme = selectedTheme,
+                onThemeChange = { selectedTheme = it },
                 onNext = { currentStep = SetupStep.COMPLETE }
             )
 
             SetupStep.COMPLETE -> CompleteStep(
                 carName = carName,
-                onFinish = { onComplete(carName) }
+                onFinish = { onComplete(carName, selectedTheme) }
             )
         }
     }
@@ -290,6 +299,67 @@ private fun NotificationStep(
     Button(
         onClick = onNext,
         enabled = isDone,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Next")
+    }
+}
+
+@Composable
+private fun ThemeStep(
+    selectedTheme: ThemeMode,
+    onThemeChange: (ThemeMode) -> Unit,
+    onNext: () -> Unit
+) {
+    Text(
+        text = "Choose Theme",
+        style = MaterialTheme.typography.headlineSmall
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = "Select your preferred app appearance.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+
+    ThemeMode.entries.forEach { mode ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(
+                selected = selectedTheme == mode,
+                onClick = { onThemeChange(mode) }
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = when (mode) {
+                        ThemeMode.SYSTEM -> "System default"
+                        ThemeMode.LIGHT -> "Light"
+                        ThemeMode.DARK -> "Dark"
+                    },
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = when (mode) {
+                        ThemeMode.SYSTEM -> "Follow your device's theme"
+                        ThemeMode.LIGHT -> "Always use light mode"
+                        ThemeMode.DARK -> "Always use dark mode"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(24.dp))
+    Button(
+        onClick = onNext,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text("Next")
