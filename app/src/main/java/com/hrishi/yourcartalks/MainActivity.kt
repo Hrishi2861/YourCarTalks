@@ -75,10 +75,13 @@ private fun SettingsScreen() {
 
     val maleManager = remember { SherpaOnnxManager(context, SherpaOnnxManager.MALE) }
     val femaleManager = remember { SherpaOnnxManager(context, SherpaOnnxManager.FEMALE) }
+    val kokoroManager = remember { SherpaOnnxManager(context, SherpaOnnxManager.KOKORO) }
     var maleDownloaded by remember { mutableStateOf(maleManager.isModelDownloaded()) }
     var femaleDownloaded by remember { mutableStateOf(femaleManager.isModelDownloaded()) }
+    var kokoroDownloaded by remember { mutableStateOf(kokoroManager.isModelDownloaded()) }
     var maleDownloadState by remember { mutableStateOf<DownloadState>(DownloadState.Idle) }
     var femaleDownloadState by remember { mutableStateOf<DownloadState>(DownloadState.Idle) }
+    var kokoroDownloadState by remember { mutableStateOf<DownloadState>(DownloadState.Idle) }
 
     Column(
         modifier = Modifier
@@ -175,6 +178,7 @@ private fun SettingsScreen() {
                                 TtsMethod.SYSTEM -> "System TTS (default)"
                                 TtsMethod.SHERPA_MALE -> "Sherpa-ONNX Male"
                                 TtsMethod.SHERPA_FEMALE -> "Sherpa-ONNX Female"
+                                TtsMethod.KOKORO -> "Kokoro British Female (Isabella)"
                             },
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f)
@@ -185,9 +189,11 @@ private fun SettingsScreen() {
                             context = context,
                             maleManager = maleManager,
                             femaleManager = femaleManager,
+                            kokoroManager = kokoroManager,
                             isDownloaded = when (method) {
                                 TtsMethod.SHERPA_MALE -> maleDownloaded
                                 TtsMethod.SHERPA_FEMALE -> femaleDownloaded
+                                TtsMethod.KOKORO -> kokoroDownloaded
                                 else -> true
                             },
                             carName = carName
@@ -229,6 +235,24 @@ private fun SettingsScreen() {
                 },
                 onDownloaded = {
                     femaleDownloaded = true
+                },
+                scope = scope
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Kokoro Model Download
+        if (currentMethod == TtsMethod.KOKORO) {
+            ModelDownloadCard(
+                config = SherpaOnnxManager.KOKORO,
+                manager = kokoroManager,
+                isDownloaded = kokoroDownloaded,
+                downloadState = kokoroDownloadState,
+                onDownload = { state ->
+                    kokoroDownloadState = state
+                },
+                onDownloaded = {
+                    kokoroDownloaded = true
                 },
                 scope = scope
             )
@@ -297,6 +321,7 @@ private fun TestButton(
     context: android.content.Context,
     maleManager: SherpaOnnxManager,
     femaleManager: SherpaOnnxManager,
+    kokoroManager: SherpaOnnxManager,
     isDownloaded: Boolean,
     carName: String
 ) {
@@ -318,12 +343,18 @@ private fun TestButton(
                         requestAudioFocusAndSpeakSherpa(context, femaleManager, text)
                     }
                 }
+                TtsMethod.KOKORO -> {
+                    if (kokoroManager.isModelDownloaded()) {
+                        requestAudioFocusAndSpeakSherpa(context, kokoroManager, text)
+                    }
+                }
             }
         },
         enabled = when (method) {
             TtsMethod.SYSTEM -> true
             TtsMethod.SHERPA_MALE -> isDownloaded
             TtsMethod.SHERPA_FEMALE -> isDownloaded
+            TtsMethod.KOKORO -> isDownloaded
         },
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
     ) {

@@ -1,11 +1,13 @@
 package com.hrishi.yourcartalks
 
+import android.Manifest
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
 import android.media.AudioManager
@@ -13,6 +15,7 @@ import android.os.Build
 import android.util.Log
 import androidx.car.app.connection.CarConnection
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
@@ -30,6 +33,14 @@ class GreetingService : LifecycleService() {
 
         fun start(context: Context) {
             Log.d(TAG, "Starting service...")
+            if (Build.VERSION.SDK_INT >= 34 &&
+                ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.BLUETOOTH_CONNECT
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Log.w(TAG, "BLUETOOTH_CONNECT not granted, skipping service start")
+                return
+            }
             val intent = Intent(context, GreetingService::class.java)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -42,6 +53,7 @@ class GreetingService : LifecycleService() {
     private var ttsManager: TextToSpeechManager? = null
     private var sherpaMale: SherpaOnnxManager? = null
     private var sherpaFemale: SherpaOnnxManager? = null
+    private var sherpaKokoro: SherpaOnnxManager? = null
     private var hasGreetedThisSession = false
 
     override fun onCreate() {
@@ -51,13 +63,16 @@ class GreetingService : LifecycleService() {
         ttsManager = TextToSpeechManager(this)
         sherpaMale = SherpaOnnxManager(this, SherpaOnnxManager.MALE)
         sherpaFemale = SherpaOnnxManager(this, SherpaOnnxManager.FEMALE)
+        sherpaKokoro = SherpaOnnxManager(this, SherpaOnnxManager.KOKORO)
 
         CarConnection(this).type.observe(this) { type ->
             Log.d(TAG, "Car connection type changed: $type")
             when (type) {
                 CarConnection.CONNECTION_TYPE_PROJECTION -> {
                     Log.d(TAG, "Android Auto projection connected")
-                    startForeground(NOTIFICATION_ID, buildNotification("Connected to Android Auto"))
+                    try {
+                        startForeground(NOTIFICATION_ID, buildNotification("Connected to Android Auto"))
+                    } catch (_: SecurityException) { }
                     if (!hasGreetedThisSession) {
                         hasGreetedThisSession = true
                         speakGreeting()
@@ -67,7 +82,9 @@ class GreetingService : LifecycleService() {
                 }
                 CarConnection.CONNECTION_TYPE_NATIVE -> {
                     Log.d(TAG, "Android Automotive (native) connected")
-                    startForeground(NOTIFICATION_ID, buildNotification("Connected to Android Auto"))
+                    try {
+                        startForeground(NOTIFICATION_ID, buildNotification("Connected to Android Auto"))
+                    } catch (_: SecurityException) { }
                 }
                 CarConnection.CONNECTION_TYPE_NOT_CONNECTED -> {
                     Log.d(TAG, "Car disconnected, resetting")
@@ -77,7 +94,12 @@ class GreetingService : LifecycleService() {
             }
         }
 
-        startForeground(NOTIFICATION_ID, buildNotification("YourCarTalks"))
+        try {
+            startForeground(NOTIFICATION_ID, buildNotification("YourCarTalks"))
+        } catch (e: SecurityException) {
+            Log.w(TAG, "startForeground failed: ${e.message}")
+            stopSelf()
+        }
     }
 
     private fun buildNotification(text: String): Notification {
@@ -129,6 +151,13 @@ class GreetingService : LifecycleService() {
                 TtsMethod.SHERPA_FEMALE -> {
                     if (sherpaFemale?.isModelDownloaded() == true) {
                         speakWithSherpa(greeting, sherpaFemale!!)
+                    } else {
+                        speakWithSystemTts(greeting)
+                    }
+                }
+                TtsMethod.KOKORO -> {
+                    if (sherpaKokoro?.isModelDownloaded() == true) {
+                        speakWithSherpa(greeting, sherpaKokoro!!)
                     } else {
                         speakWithSystemTts(greeting)
                     }
@@ -214,6 +243,8 @@ class GreetingService : LifecycleService() {
         sherpaMale = null
         sherpaFemale?.shutdown()
         sherpaFemale = null
+        sherpaKokoro?.shutdown()
+        sherpaKokoro = null
         super.onDestroy()
     }
 }

@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 private val Context.store: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 enum class TtsMethod {
-    SYSTEM, SHERPA_MALE, SHERPA_FEMALE
+    SYSTEM, SHERPA_MALE, SHERPA_FEMALE, KOKORO
 }
 
 enum class ThemeMode {

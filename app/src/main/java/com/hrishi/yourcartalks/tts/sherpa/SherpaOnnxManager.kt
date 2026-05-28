@@ -10,6 +10,7 @@ import com.k2fsa.sherpa.onnx.GeneratedAudio
 import com.k2fsa.sherpa.onnx.OfflineTts
 import com.k2fsa.sherpa.onnx.OfflineTtsConfig
 import com.k2fsa.sherpa.onnx.OfflineTtsModelConfig
+import com.k2fsa.sherpa.onnx.OfflineTtsKokoroModelConfig
 import com.k2fsa.sherpa.onnx.OfflineTtsVitsModelConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,7 +28,10 @@ data class SherpaModelConfig(
     val onnxFile: String,
     val downloadUrl: URL,
     val displayName: String,
-    val gender: String
+    val gender: String,
+    val modelType: String = "vits",
+    val voicesFile: String = "",
+    val speakerId: Int = 0
 )
 
 class SherpaOnnxManager(private val context: Context, val config: SherpaModelConfig) {
@@ -54,6 +58,19 @@ class SherpaOnnxManager(private val context: Context, val config: SherpaModelCon
             ),
             displayName = "Sherpa-ONNX (offline AI)",
             gender = "Female"
+        )
+
+        val KOKORO = SherpaModelConfig(
+            name = "kokoro-en-v0_19",
+            onnxFile = "model.onnx",
+            downloadUrl = URL(
+                "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-en-v0_19.tar.bz2"
+            ),
+            displayName = "Kokoro (offline AI)",
+            gender = "British Female (Isabella)",
+            modelType = "kokoro",
+            voicesFile = "voices.bin",
+            speakerId = 8
         )
     }
 
@@ -185,18 +202,36 @@ class SherpaOnnxManager(private val context: Context, val config: SherpaModelCon
         try {
             val modelPath = modelDir.absolutePath
 
-            val vitsConfig = OfflineTtsVitsModelConfig(
-                model = "$modelPath/${config.onnxFile}",
-                tokens = "$modelPath/tokens.txt",
-                dataDir = "$modelPath/espeak-ng-data"
-            )
-
-            val modelConfig = OfflineTtsModelConfig(
-                vits = vitsConfig,
-                numThreads = 2,
-                debug = false,
-                provider = "cpu"
-            )
+            val modelConfig = if (config.modelType == "kokoro") {
+                val kokoroConfig = OfflineTtsKokoroModelConfig(
+                    model = "$modelPath/${config.onnxFile}",
+                    voices = "$modelPath/${config.voicesFile}",
+                    tokens = "$modelPath/tokens.txt",
+                    dataDir = "$modelPath/espeak-ng-data",
+                    lexicon = "",
+                    lang = "en-US",
+                    dictDir = "",
+                    lengthScale = 1.0f
+                )
+                OfflineTtsModelConfig(
+                    kokoro = kokoroConfig,
+                    numThreads = 2,
+                    debug = false,
+                    provider = "cpu"
+                )
+            } else {
+                val vitsConfig = OfflineTtsVitsModelConfig(
+                    model = "$modelPath/${config.onnxFile}",
+                    tokens = "$modelPath/tokens.txt",
+                    dataDir = "$modelPath/espeak-ng-data"
+                )
+                OfflineTtsModelConfig(
+                    vits = vitsConfig,
+                    numThreads = 2,
+                    debug = false,
+                    provider = "cpu"
+                )
+            }
 
             val ttsConfig = OfflineTtsConfig(model = modelConfig)
 
@@ -218,7 +253,7 @@ class SherpaOnnxManager(private val context: Context, val config: SherpaModelCon
 
         Thread {
             try {
-                val audio: GeneratedAudio = tts!!.generate(text = text, sid = 0, speed = 1.0f)
+                val audio: GeneratedAudio = tts!!.generate(text = text, sid = config.speakerId, speed = 1.0f)
 
                 if (audio.samples.isEmpty()) {
                     Log.w(TAG, "Generated audio is empty")

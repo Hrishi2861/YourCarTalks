@@ -32,6 +32,7 @@ enum class SetupStep {
     BATTERY_OPT,
     AUTO_START,
     NOTIFICATION,
+    BLUETOOTH,
     THEME,
     COMPLETE
 }
@@ -47,12 +48,19 @@ fun SetupScreen(
     var selectedTheme by remember { mutableStateOf(ThemeMode.SYSTEM) }
     var batteryOptDone by remember { mutableStateOf(false) }
     var notificationDone by remember { mutableStateOf(false) }
+    var bluetoothDone by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         notificationDone = granted
+    }
+
+    val bluetoothPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        bluetoothDone = granted
     }
 
     Column(
@@ -115,6 +123,25 @@ fun SetupScreen(
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     } else {
                         notificationDone = true
+                    }
+                },
+                onNext = {
+                    currentStep = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        SetupStep.BLUETOOTH
+                    } else {
+                        bluetoothDone = true
+                        SetupStep.THEME
+                    }
+                }
+            )
+
+            SetupStep.BLUETOOTH -> BluetoothStep(
+                isDone = bluetoothDone,
+                onRequest = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        bluetoothPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT)
+                    } else {
+                        bluetoothDone = true
                     }
                 },
                 onNext = { currentStep = SetupStep.THEME }
@@ -275,6 +302,50 @@ private fun NotificationStep(
     Text(
         text = "YourCarTalks needs notification permission to keep a foreground service " +
                 "running. This allows it to monitor Android Auto connections in the background.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+
+    if (isDone) {
+        AssistChip(
+            onClick = {},
+            label = { Text("Granted") },
+            leadingIcon = { Text("✓") }
+        )
+    } else {
+        OutlinedButton(
+            onClick = onRequest,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Grant Permission")
+        }
+    }
+
+    Spacer(modifier = Modifier.height(24.dp))
+    Button(
+        onClick = onNext,
+        enabled = isDone,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Next")
+    }
+}
+
+@Composable
+private fun BluetoothStep(
+    isDone: Boolean,
+    onRequest: () -> Unit,
+    onNext: () -> Unit
+) {
+    Text(
+        text = "Bluetooth Permission",
+        style = MaterialTheme.typography.headlineSmall
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = "YourCarTalks needs Bluetooth permission to use the foreground service " +
+                "that detects Android Auto connections on Android 12+.",
         style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
