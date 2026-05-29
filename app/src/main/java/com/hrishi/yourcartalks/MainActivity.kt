@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import com.hrishi.yourcartalks.data.GreetingMessages
+import com.hrishi.yourcartalks.data.GreetingNameMode
 import com.hrishi.yourcartalks.data.ThemeMode
 import com.hrishi.yourcartalks.data.TtsMethod
 import com.hrishi.yourcartalks.tts.TextToSpeechManager
@@ -78,10 +79,11 @@ class MainActivity : ComponentActivity() {
             YourCarTalksTheme(themeMode) {
                 when (isSetupComplete) {
                     null -> Unit
-                    false -> SetupScreen { carName, driverName, theme ->
+                    false -> SetupScreen { carName, driverName, nameMode, theme ->
                         lifecycleScope.launch {
                             prefs.saveCarName(carName)
                             prefs.saveDriverName(driverName)
+                            prefs.saveNameMode(nameMode)
                             prefs.setThemeMode(theme)
                             prefs.setSetupComplete()
                             GreetingService.start(this@MainActivity)
@@ -109,6 +111,7 @@ private fun SettingsScreen() {
     val driverName by prefs.driverName.collectAsState(initial = "")
     val currentMethod by prefs.ttsMethod.collectAsState(initial = TtsMethod.SYSTEM)
     val currentTheme by prefs.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+    val currentNameMode by prefs.nameMode.collectAsState(initial = GreetingNameMode.RANDOM)
     val selectedGreeting by prefs.selectedGreeting.collectAsState(initial = "")
 
     val maleManager = remember { SherpaOnnxManager(context, SherpaOnnxManager.MALE) }
@@ -199,7 +202,7 @@ private fun SettingsScreen() {
                         selected = currentMethod == method,
                         onClick = { scope.launch { prefs.setTtsMethod(method) } },
                         testEnabled = isDownloaded,
-                        testText = buildTestText(driverName, carName, selectedGreeting),
+                        testText = buildTestText(driverName, carName, selectedGreeting, currentNameMode),
                         onTest = { method, text ->
                             when (method) {
                                 TtsMethod.SYSTEM -> {
@@ -294,6 +297,22 @@ private fun SettingsScreen() {
 
             item {
                 Text(
+                    text = "GREETING NAME",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+            item {
+                NameModeSelector(
+                    currentMode = currentNameMode,
+                    onModeSelected = { scope.launch { prefs.saveNameMode(it) } }
+                )
+            }
+
+            item {
+                Text(
                     text = "APP THEME",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.secondary,
@@ -318,15 +337,39 @@ private fun SettingsScreen() {
 private fun buildTestText(
     driverName: String,
     carName: String,
-    selectedGreeting: String
+    selectedGreeting: String,
+    nameMode: GreetingNameMode
 ): String {
-    return if (driverName.isNotBlank() && kotlin.random.Random.nextBoolean()) {
-        val messagePart = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
-        val formatted = GreetingMessages.format(messagePart, "your car")
-        "Hello $driverName. $formatted"
-    } else {
-        val messagePart = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
-        GreetingMessages.format(messagePart, carName)
+    return when (nameMode) {
+        GreetingNameMode.DRIVER_NAME -> {
+            if (driverName.isNotBlank()) {
+                val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                val formatted = GreetingMessages.format(msg, "your car")
+                "Hello $driverName. $formatted"
+            } else {
+                val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                GreetingMessages.format(msg, carName)
+            }
+        }
+        GreetingNameMode.CAR_NAME -> {
+            val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+            GreetingMessages.format(msg, carName)
+        }
+        GreetingNameMode.BOTH -> {
+            val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+            val formatted = GreetingMessages.format(msg, carName)
+            if (driverName.isNotBlank()) "Hello $driverName. $formatted" else formatted
+        }
+        GreetingNameMode.RANDOM -> {
+            if (driverName.isNotBlank() && kotlin.random.Random.nextBoolean()) {
+                val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                val formatted = GreetingMessages.format(msg, "your car")
+                "Hello $driverName. $formatted"
+            } else {
+                val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                GreetingMessages.format(msg, carName)
+            }
+        }
     }
 }
 
@@ -874,6 +917,46 @@ private fun ThemeSegmentedControl(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun NameModeSelector(
+    currentMode: GreetingNameMode,
+    onModeSelected: (GreetingNameMode) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        GreetingNameMode.entries.forEach { mode ->
+            val selected = currentMode == mode
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (selected) AutoColors.selectedBg else Color.Transparent)
+                    .border(
+                        width = if (selected) 1.5.dp else 1.dp,
+                        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(8.dp)
+                    )
+                    .clickable { onModeSelected(mode) }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = when (mode) {
+                        GreetingNameMode.CAR_NAME -> "Car"
+                        GreetingNameMode.DRIVER_NAME -> "Driver"
+                        GreetingNameMode.BOTH -> "Both"
+                        GreetingNameMode.RANDOM -> "Random"
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                )
             }
         }
     }

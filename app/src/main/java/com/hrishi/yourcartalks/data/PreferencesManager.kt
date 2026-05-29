@@ -21,6 +21,10 @@ enum class ThemeMode {
     SYSTEM, LIGHT, DARK
 }
 
+enum class GreetingNameMode {
+    CAR_NAME, DRIVER_NAME, BOTH, RANDOM
+}
+
 class PreferencesManager(private val context: Context) {
 
     private object Keys {
@@ -31,6 +35,7 @@ class PreferencesManager(private val context: Context) {
         val SHERPA_MODEL_PATH = stringPreferencesKey("sherpa_model_path")
         val THEME_MODE = stringPreferencesKey("theme_mode")
         val SELECTED_GREETING = stringPreferencesKey("selected_greeting")
+        val NAME_MODE = stringPreferencesKey("name_mode")
     }
 
     val carName: Flow<String> = context.store.data.map { prefs ->
@@ -61,6 +66,10 @@ class PreferencesManager(private val context: Context) {
         prefs[Keys.SELECTED_GREETING] ?: ""
     }
 
+    val nameMode: Flow<GreetingNameMode> = context.store.data.map { prefs ->
+        parseNameMode(prefs[Keys.NAME_MODE])
+    }
+
     private fun parseTtsMethod(value: String?): TtsMethod {
         if (value == null) return TtsMethod.SYSTEM
         return when (value) {
@@ -79,6 +88,15 @@ class PreferencesManager(private val context: Context) {
             ThemeMode.valueOf(value)
         } catch (_: Exception) {
             ThemeMode.SYSTEM
+        }
+    }
+
+    private fun parseNameMode(value: String?): GreetingNameMode {
+        if (value == null) return GreetingNameMode.RANDOM
+        return try {
+            GreetingNameMode.valueOf(value)
+        } catch (_: Exception) {
+            GreetingNameMode.RANDOM
         }
     }
 
@@ -146,5 +164,15 @@ class PreferencesManager(private val context: Context) {
 
     suspend fun getSelectedGreeting(): String {
         return context.store.data.first()[Keys.SELECTED_GREETING] ?: ""
+    }
+
+    suspend fun saveNameMode(mode: GreetingNameMode) {
+        context.store.edit { prefs ->
+            prefs[Keys.NAME_MODE] = mode.name
+        }
+    }
+
+    suspend fun getNameMode(): GreetingNameMode {
+        return parseNameMode(context.store.data.first()[Keys.NAME_MODE])
     }
 }

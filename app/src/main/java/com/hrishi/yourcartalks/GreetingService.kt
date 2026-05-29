@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.hrishi.yourcartalks.data.GreetingMessages
+import com.hrishi.yourcartalks.data.GreetingNameMode
 import com.hrishi.yourcartalks.data.TtsMethod
 import com.hrishi.yourcartalks.tts.TextToSpeechManager
 import com.hrishi.yourcartalks.tts.sherpa.SherpaOnnxManager
@@ -139,14 +140,38 @@ class GreetingService : LifecycleService() {
 
             val driverName = prefs.getDriverName()
             val selectedGreeting = prefs.getSelectedGreeting()
+            val nameMode = prefs.getNameMode()
 
-            val greeting = if (driverName.isNotBlank() && kotlin.random.Random.nextBoolean()) {
-                val messagePart = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
-                val formatted = GreetingMessages.format(messagePart, "your car")
-                "Hello $driverName. $formatted"
-            } else {
-                val messagePart = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
-                GreetingMessages.format(messagePart, carName)
+            val greeting = when (nameMode) {
+                GreetingNameMode.DRIVER_NAME -> {
+                    if (driverName.isNotBlank()) {
+                        val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                        val formatted = GreetingMessages.format(msg, "your car")
+                        "Hello $driverName. $formatted"
+                    } else {
+                        val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                        GreetingMessages.format(msg, carName)
+                    }
+                }
+                GreetingNameMode.CAR_NAME -> {
+                    val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                    GreetingMessages.format(msg, carName)
+                }
+                GreetingNameMode.BOTH -> {
+                    val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                    val formatted = GreetingMessages.format(msg, carName)
+                    if (driverName.isNotBlank()) "Hello $driverName. $formatted" else formatted
+                }
+                GreetingNameMode.RANDOM -> {
+                    if (driverName.isNotBlank() && kotlin.random.Random.nextBoolean()) {
+                        val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                        val formatted = GreetingMessages.format(msg, "your car")
+                        "Hello $driverName. $formatted"
+                    } else {
+                        val msg = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                        GreetingMessages.format(msg, carName)
+                    }
+                }
             }
             Log.d(TAG, "Greeting text: '$greeting'")
 

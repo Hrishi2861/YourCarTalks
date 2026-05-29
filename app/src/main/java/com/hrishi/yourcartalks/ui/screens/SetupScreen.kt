@@ -25,6 +25,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import com.hrishi.yourcartalks.data.GreetingNameMode
 import com.hrishi.yourcartalks.data.ThemeMode
 
 enum class SetupStep {
@@ -34,6 +35,7 @@ enum class SetupStep {
     AUTO_START,
     NOTIFICATION,
     BLUETOOTH,
+    NAME_MODE,
     THEME,
     COMPLETE
 }
@@ -41,12 +43,13 @@ enum class SetupStep {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupScreen(
-    onComplete: (String, String, ThemeMode) -> Unit
+    onComplete: (String, String, GreetingNameMode, ThemeMode) -> Unit
 ) {
     val context = LocalContext.current
     var currentStep by remember { mutableStateOf(SetupStep.CAR_NAME) }
     var carName by remember { mutableStateOf("") }
     var driverName by remember { mutableStateOf("") }
+    var selectedNameMode by remember { mutableStateOf(GreetingNameMode.RANDOM) }
     var selectedTheme by remember { mutableStateOf(ThemeMode.SYSTEM) }
     var batteryOptDone by remember { mutableStateOf(false) }
     var notificationDone by remember { mutableStateOf(false) }
@@ -152,6 +155,12 @@ fun SetupScreen(
                         bluetoothDone = true
                     }
                 },
+                onNext = { currentStep = SetupStep.NAME_MODE }
+            )
+
+            SetupStep.NAME_MODE -> NameModeStep(
+                selectedMode = selectedNameMode,
+                onModeChange = { selectedNameMode = it },
                 onNext = { currentStep = SetupStep.THEME }
             )
 
@@ -163,7 +172,7 @@ fun SetupScreen(
 
             SetupStep.COMPLETE -> CompleteStep(
                 carName = carName,
-                onFinish = { onComplete(carName, driverName, selectedTheme) }
+                onFinish = { onComplete(carName, driverName, selectedNameMode, selectedTheme) }
             )
         }
     }
@@ -425,6 +434,71 @@ private fun BluetoothStep(
     Button(
         onClick = onNext,
         enabled = isDone,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Next")
+    }
+}
+
+@Composable
+private fun NameModeStep(
+    selectedMode: GreetingNameMode,
+    onModeChange: (GreetingNameMode) -> Unit,
+    onNext: () -> Unit
+) {
+    Text(
+        text = "Greeting Name",
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = "Choose how your name and car name appear in the greeting.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+
+    GreetingNameMode.entries.forEach { mode ->
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(
+                selected = selectedMode == mode,
+                onClick = { onModeChange(mode) }
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(
+                    text = when (mode) {
+                        GreetingNameMode.CAR_NAME -> "Car Name Only"
+                        GreetingNameMode.DRIVER_NAME -> "Driver Name Only"
+                        GreetingNameMode.BOTH -> "Both Names"
+                        GreetingNameMode.RANDOM -> "Random"
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = when (mode) {
+                        GreetingNameMode.CAR_NAME -> "Greet using your car's name only"
+                        GreetingNameMode.DRIVER_NAME -> "Greet using your name only"
+                        GreetingNameMode.BOTH -> "Include both your name and car name"
+                        GreetingNameMode.RANDOM -> "Randomly pick how you're greeted"
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+
+    Spacer(modifier = Modifier.height(24.dp))
+    Button(
+        onClick = onNext,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text("Next")
