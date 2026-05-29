@@ -58,22 +58,14 @@ fun PersonIcon(
 @Composable
 fun PencilIcon(
     modifier: Modifier = Modifier,
-    color: Color = Color(0xFF757575),
-    strokeWidth: Float = 1.5f
+    color: Color = Color(0xFF757575)
 ) {
-    Canvas(modifier) {
-        val w = size.width
-        val h = size.height
-        val path = Path().apply {
-            moveTo(w * 0.3f, h * 0.85f)
-            lineTo(w * 0.8f, h * 0.2f)
-            lineTo(w * 0.6f, h * 0.1f)
-            lineTo(w * 0.1f, h * 0.75f)
-            close()
-        }
-        drawPath(path, color = color, style = Stroke(strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round))
-        drawLine(color = color, start = Offset(w * 0.7f, h * 0.15f), end = Offset(w * 0.85f, h * 0.3f), strokeWidth = strokeWidth, cap = StrokeCap.Round)
-    }
+    Icon(
+        painter = painterResource(R.drawable.ic_edit),
+        contentDescription = null,
+        modifier = modifier,
+        tint = color
+    )
 }
 
 @Composable
