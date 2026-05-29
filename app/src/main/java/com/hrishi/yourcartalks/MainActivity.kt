@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import com.hrishi.yourcartalks.data.GreetingMessages
 import com.hrishi.yourcartalks.data.ThemeMode
 import com.hrishi.yourcartalks.data.TtsMethod
 import com.hrishi.yourcartalks.tts.TextToSpeechManager
@@ -40,9 +41,10 @@ class MainActivity : ComponentActivity() {
             YourCarTalksTheme(themeMode) {
                 when (isSetupComplete) {
                     null -> Unit
-                    false -> SetupScreen { carName, theme ->
+                    false -> SetupScreen { carName, driverName, theme ->
                         lifecycleScope.launch {
                             prefs.saveCarName(carName)
+                            prefs.saveDriverName(driverName)
                             prefs.setThemeMode(theme)
                             prefs.setSetupComplete()
                             GreetingService.start(this@MainActivity)
@@ -67,11 +69,15 @@ private fun SettingsScreen() {
     val scope = rememberCoroutineScope()
 
     val carName by prefs.carName.collectAsState(initial = "")
+    val driverName by prefs.driverName.collectAsState(initial = "")
     val currentMethod by prefs.ttsMethod.collectAsState(initial = TtsMethod.SYSTEM)
     val currentTheme by prefs.themeMode.collectAsState(initial = ThemeMode.SYSTEM)
+    val selectedGreeting by prefs.selectedGreeting.collectAsState(initial = "")
 
     var editing by remember { mutableStateOf(false) }
     var editText by remember(carName) { mutableStateOf(carName) }
+    var editingDriverName by remember { mutableStateOf(false) }
+    var driverNameEditText by remember(driverName) { mutableStateOf(driverName) }
 
     val maleManager = remember { SherpaOnnxManager(context, SherpaOnnxManager.MALE) }
     val femaleManager = remember { SherpaOnnxManager(context, SherpaOnnxManager.FEMALE) }
@@ -150,6 +156,57 @@ private fun SettingsScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Driver Name
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Driver Name",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (editingDriverName) {
+                    OutlinedTextField(
+                        value = driverNameEditText,
+                        onValueChange = { driverNameEditText = it },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = { editingDriverName = false }) {
+                            Text("Cancel")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(onClick = {
+                            scope.launch { prefs.saveDriverName(driverNameEditText) }
+                            editingDriverName = false
+                        }) {
+                            Text("Save")
+                        }
+                    }
+                } else {
+                    Text(
+                        text = driverName.ifBlank { "Tap to set your name" },
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = if (driverName.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextButton(onClick = {
+                        driverNameEditText = driverName
+                        editingDriverName = true
+                    }) {
+                        Text(if (driverName.isBlank()) "Add" else "Edit")
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         // TTS Method
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
@@ -196,7 +253,9 @@ private fun SettingsScreen() {
                                 TtsMethod.KOKORO -> kokoroDownloaded
                                 else -> true
                             },
-                            carName = carName
+                            carName = carName,
+                            driverName = driverName,
+                            selectedGreeting = selectedGreeting
                         )
                     }
                 }
@@ -258,6 +317,69 @@ private fun SettingsScreen() {
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
+
+        // Greeting Style
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = "Greeting Style",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val messages = remember { GreetingMessages.all() }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = selectedGreeting.isBlank(),
+                        onClick = {
+                            scope.launch { prefs.saveSelectedGreeting("") }
+                        }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Random (default)",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 240.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    messages.forEach { message ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = selectedGreeting == message,
+                                onClick = {
+                                    scope.launch { prefs.saveSelectedGreeting(message) }
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = GreetingMessages.preview(message, "Your Car"),
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Theme
         Card(modifier = Modifier.fillMaxWidth()) {
@@ -323,11 +445,20 @@ private fun TestButton(
     femaleManager: SherpaOnnxManager,
     kokoroManager: SherpaOnnxManager,
     isDownloaded: Boolean,
-    carName: String
+    carName: String,
+    driverName: String,
+    selectedGreeting: String
 ) {
     Button(
         onClick = {
-            val text = if (carName.isNotBlank()) "Welcome to your $carName" else "Welcome to your car"
+            val text = if (driverName.isNotBlank() && kotlin.random.Random.nextBoolean()) {
+                val messagePart = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                val formatted = GreetingMessages.format(messagePart, "your car")
+                "Hello $driverName. $formatted"
+            } else {
+                val messagePart = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                GreetingMessages.format(messagePart, carName)
+            }
             when (method) {
                 TtsMethod.SYSTEM -> {
                     val ttsManager = TextToSpeechManager(context)

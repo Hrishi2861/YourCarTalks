@@ -1,5 +1,48 @@
 # Changelog
 
+## v1.2 (2026-05-29)
+
+### Greeting Messages & Driver Name
+
+**Greeting Messages:**
+- 20 handcrafted greeting messages in 5 categories (Performance, Racing, Sci-Fi, Attitude, Time-Based)
+- Random mode picks a different message each drive
+- Messages can be selected directly in Settings
+- Fallback to "Welcome to your {car_name}" when no driver name is set
+
+**Driver Name:**
+- New driver name input in Setup Wizard (optional — can skip)
+- "Tap to set your name" placeholder in Settings
+- Greeting becomes: "Welcome Hrishi. Your Tesla is ready for launch."
+- Editable inline in Settings (same pattern as Car Name)
+
+**Full greeting logic:**
+- With driver name + specific message: "Welcome {name}. {formatted message}"
+- With driver name + random: "Welcome {name}. {random message from all 20}"
+- Without driver name: "Welcome to your {car_name}" (unchanged)
+
+## v1.1 (2026-05-29)
+
+### Kokoro Voice, Bluetooth Permission & Crash Fix
+
+**Kokoro BF Isabella TTS:**
+- Added 4th TTS option: Kokoro British Female (Isabella) — ~330 MB download
+- Uses `OfflineTtsKokoroModelConfig` from sherpa-onnx 1.13.2 AAR
+- Downloadable from `k2-fsa/sherpa-onnx` releases (kokoro-en-v0_19)
+- Falls back to system TTS if model not downloaded
+- Full integration: settings radio button, test button, model download card, greeting dispatch
+
+**Bluetooth Permission (Android 12+):**
+- Added `BLUETOOTH_CONNECT` permission to manifest
+- New `BluetoothStep` in setup wizard (auto-skipped on API < 31)
+- Runtime permission requested via `ActivityResultContracts.RequestPermission`
+- Required for `connectedDevice` foreground service type on Android 14+
+
+**Crash Fix (API 34+):**
+- Check `BLUETOOTH_CONNECT` permission before calling `startForegroundService()`
+- Wrapped `startForeground()` in try-catch `SecurityException` as safety net
+- Prevents instant crash on devices running Android 14+
+
 ## v1.0 (2026-05-28)
 
 ### First Stable Release

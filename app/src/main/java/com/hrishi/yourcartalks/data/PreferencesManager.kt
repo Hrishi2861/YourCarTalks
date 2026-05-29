@@ -25,10 +25,12 @@ class PreferencesManager(private val context: Context) {
 
     private object Keys {
         val CAR_NAME = stringPreferencesKey("car_name")
+        val DRIVER_NAME = stringPreferencesKey("driver_name")
         val IS_SETUP_COMPLETE = booleanPreferencesKey("is_setup_complete")
         val TTS_METHOD = stringPreferencesKey("tts_method")
         val SHERPA_MODEL_PATH = stringPreferencesKey("sherpa_model_path")
         val THEME_MODE = stringPreferencesKey("theme_mode")
+        val SELECTED_GREETING = stringPreferencesKey("selected_greeting")
     }
 
     val carName: Flow<String> = context.store.data.map { prefs ->
@@ -49,6 +51,14 @@ class PreferencesManager(private val context: Context) {
 
     val themeMode: Flow<ThemeMode> = context.store.data.map { prefs ->
         parseThemeMode(prefs[Keys.THEME_MODE])
+    }
+
+    val driverName: Flow<String> = context.store.data.map { prefs ->
+        prefs[Keys.DRIVER_NAME] ?: ""
+    }
+
+    val selectedGreeting: Flow<String> = context.store.data.map { prefs ->
+        prefs[Keys.SELECTED_GREETING] ?: ""
     }
 
     private fun parseTtsMethod(value: String?): TtsMethod {
@@ -116,5 +126,25 @@ class PreferencesManager(private val context: Context) {
 
     suspend fun getThemeMode(): ThemeMode {
         return parseThemeMode(context.store.data.first()[Keys.THEME_MODE])
+    }
+
+    suspend fun saveDriverName(name: String) {
+        context.store.edit { prefs ->
+            prefs[Keys.DRIVER_NAME] = name
+        }
+    }
+
+    suspend fun getDriverName(): String {
+        return context.store.data.first()[Keys.DRIVER_NAME] ?: ""
+    }
+
+    suspend fun saveSelectedGreeting(message: String) {
+        context.store.edit { prefs ->
+            prefs[Keys.SELECTED_GREETING] = message
+        }
+    }
+
+    suspend fun getSelectedGreeting(): String {
+        return context.store.data.first()[Keys.SELECTED_GREETING] ?: ""
     }
 }

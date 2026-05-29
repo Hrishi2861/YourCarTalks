@@ -20,6 +20,7 @@ import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.hrishi.yourcartalks.data.GreetingMessages
 import com.hrishi.yourcartalks.data.TtsMethod
 import com.hrishi.yourcartalks.tts.TextToSpeechManager
 import com.hrishi.yourcartalks.tts.sherpa.SherpaOnnxManager
@@ -136,7 +137,17 @@ class GreetingService : LifecycleService() {
                 return@launch
             }
 
-            val greeting = getString(R.string.greeting_template, carName)
+            val driverName = prefs.getDriverName()
+            val selectedGreeting = prefs.getSelectedGreeting()
+
+            val greeting = if (driverName.isNotBlank() && kotlin.random.Random.nextBoolean()) {
+                val messagePart = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                val formatted = GreetingMessages.format(messagePart, "your car")
+                "Hello $driverName. $formatted"
+            } else {
+                val messagePart = if (selectedGreeting.isNotBlank()) selectedGreeting else GreetingMessages.random()
+                GreetingMessages.format(messagePart, carName)
+            }
             Log.d(TAG, "Greeting text: '$greeting'")
 
             val method = prefs.getTtsMethod()

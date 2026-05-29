@@ -29,6 +29,7 @@ import com.hrishi.yourcartalks.data.ThemeMode
 
 enum class SetupStep {
     CAR_NAME,
+    DRIVER_NAME,
     BATTERY_OPT,
     AUTO_START,
     NOTIFICATION,
@@ -40,11 +41,12 @@ enum class SetupStep {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetupScreen(
-    onComplete: (String, ThemeMode) -> Unit
+    onComplete: (String, String, ThemeMode) -> Unit
 ) {
     val context = LocalContext.current
     var currentStep by remember { mutableStateOf(SetupStep.CAR_NAME) }
     var carName by remember { mutableStateOf("") }
+    var driverName by remember { mutableStateOf("") }
     var selectedTheme by remember { mutableStateOf(ThemeMode.SYSTEM) }
     var batteryOptDone by remember { mutableStateOf(false) }
     var notificationDone by remember { mutableStateOf(false) }
@@ -92,7 +94,13 @@ fun SetupScreen(
             SetupStep.CAR_NAME -> CarNameStep(
                 carName = carName,
                 onCarNameChange = { carName = it },
-                onNext = { if (carName.isNotBlank()) currentStep = SetupStep.BATTERY_OPT }
+                onNext = { if (carName.isNotBlank()) currentStep = SetupStep.DRIVER_NAME }
+            )
+
+            SetupStep.DRIVER_NAME -> DriverNameStep(
+                driverName = driverName,
+                onDriverNameChange = { driverName = it },
+                onNext = { currentStep = SetupStep.BATTERY_OPT }
             )
 
             SetupStep.BATTERY_OPT -> BatteryOptStep(
@@ -155,7 +163,7 @@ fun SetupScreen(
 
             SetupStep.COMPLETE -> CompleteStep(
                 carName = carName,
-                onFinish = { onComplete(carName, selectedTheme) }
+                onFinish = { onComplete(carName, driverName, selectedTheme) }
             )
         }
     }
@@ -200,6 +208,47 @@ private fun CarNameStep(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text("Next")
+    }
+}
+
+@Composable
+private fun DriverNameStep(
+    driverName: String,
+    onDriverNameChange: (String) -> Unit,
+    onNext: () -> Unit
+) {
+    Text(
+        text = "What's your name?",
+        style = MaterialTheme.typography.headlineMedium
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = "So I can greet you personally: \"Welcome Hrishi. Your car is ready for launch.\" You can skip this if you prefer.",
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+
+    OutlinedTextField(
+        value = driverName,
+        onValueChange = onDriverNameChange,
+        label = { Text("Your Name") },
+        placeholder = { Text("e.g., Hrishi, Alex, Sarah") },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Words,
+            imeAction = ImeAction.Done
+        ),
+        keyboardActions = KeyboardActions(onDone = { onNext() }),
+        modifier = Modifier.fillMaxWidth()
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+
+    Button(
+        onClick = onNext,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(if (driverName.isNotBlank()) "Next" else "Skip")
     }
 }
 
