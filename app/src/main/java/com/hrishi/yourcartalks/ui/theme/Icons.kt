@@ -1,6 +1,7 @@
 package com.hrishi.yourcartalks.ui.theme
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -12,74 +13,46 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.res.painterResource
+import com.hrishi.yourcartalks.R
 
 @Composable
 fun CarSilhouetteIcon(
     modifier: Modifier = Modifier,
-    color: Color = Color.White,
-    strokeWidth: Float = 2f
+    color: Color = Color.White
 ) {
-    Canvas(modifier) {
-        val w = size.width
-        val h = size.height
-        val path = Path().apply {
-            moveTo(w * 0.05f, h * 0.85f)
-            lineTo(w * 0.1f, h * 0.55f)
-            lineTo(w * 0.18f, h * 0.3f)
-            cubicTo(w * 0.2f, h * 0.25f, w * 0.25f, h * 0.15f, w * 0.35f, h * 0.15f)
-            lineTo(w * 0.65f, h * 0.15f)
-            cubicTo(w * 0.7f, h * 0.15f, w * 0.8f, h * 0.2f, w * 0.85f, h * 0.3f)
-            lineTo(w * 0.92f, h * 0.5f)
-            lineTo(w * 0.95f, h * 0.85f)
-            close()
-        }
-        drawPath(path, color = color, style = Stroke(width = strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round))
-
-        val wheel1x = w * 0.22f
-        val wheel2x = w * 0.75f
-        val wheelY = h * 0.85f
-        val wheelR = w * 0.07f
-        drawCircle(color = color, radius = wheelR, center = Offset(wheel1x, wheelY), style = Stroke(strokeWidth))
-        drawCircle(color = color, radius = wheelR, center = Offset(wheel2x, wheelY), style = Stroke(strokeWidth))
-    }
+    Icon(
+        painter = painterResource(R.drawable.ic_car),
+        contentDescription = null,
+        modifier = modifier,
+        tint = color
+    )
 }
 
 @Composable
 fun KeyIcon(
     modifier: Modifier = Modifier,
-    color: Color = Color.White,
-    strokeWidth: Float = 1.5f
+    color: Color = Color.White
 ) {
-    Canvas(modifier) {
-        val w = size.width
-        val h = size.height
-        val bowCenter = Offset(w * 0.35f, h * 0.25f)
-        val bowR = w * 0.2f
-        drawCircle(color = color, radius = bowR, center = bowCenter, style = Stroke(strokeWidth))
-        val bladeStart = w * 0.35f
-        drawLine(color = color, start = Offset(bladeStart, h * 0.45f), end = Offset(bladeStart, h * 0.85f), strokeWidth = strokeWidth, cap = StrokeCap.Round)
-        drawLine(color = color, start = Offset(bladeStart, h * 0.55f), end = Offset(bladeStart + w * 0.12f, h * 0.55f), strokeWidth = strokeWidth, cap = StrokeCap.Round)
-        drawLine(color = color, start = Offset(bladeStart, h * 0.65f), end = Offset(bladeStart + w * 0.08f, h * 0.65f), strokeWidth = strokeWidth, cap = StrokeCap.Round)
-    }
+    Icon(
+        painter = painterResource(R.drawable.ic_contact),
+        contentDescription = null,
+        modifier = modifier,
+        tint = color
+    )
 }
 
 @Composable
 fun PersonIcon(
     modifier: Modifier = Modifier,
-    color: Color = Color.White,
-    strokeWidth: Float = 1.5f
+    color: Color = Color.White
 ) {
-    Canvas(modifier) {
-        val cx = size.width * 0.5f
-        val headR = size.width * 0.15f
-        val headY = size.height * 0.2f
-        drawCircle(color = color, radius = headR, center = Offset(cx, headY), style = Stroke(strokeWidth))
-        val path = Path().apply {
-            moveTo(cx - size.width * 0.3f, size.height * 0.55f)
-            cubicTo(cx - size.width * 0.2f, size.height * 0.8f, cx + size.width * 0.2f, size.height * 0.8f, cx + size.width * 0.3f, size.height * 0.55f)
-        }
-        drawPath(path, color = color, style = Stroke(strokeWidth, cap = StrokeCap.Round, join = StrokeJoin.Round))
-    }
+    Icon(
+        painter = painterResource(R.drawable.ic_person),
+        contentDescription = null,
+        modifier = modifier,
+        tint = color
+    )
 }
 
 @Composable
