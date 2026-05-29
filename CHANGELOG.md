@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.4 (2026-05-29)
+
+### Greeting Name Mode Selector
+
+**New Feature:**
+- Added `GreetingNameMode` enum with 4 modes: Car Name Only, Driver Name Only, Both Names, Random
+- New "Greeting Name" step in setup wizard (between Bluetooth Permission and Choose Theme)
+- Settings screen now has a "GREETING NAME" section with a 4-button selector above "APP THEME"
+
+**How it works:**
+- **Car Name Only** — Greeting uses only your car's name (e.g., "Tesla is ready to run.")
+- **Driver Name Only** — Greeting uses only your name (e.g., "Hello Hrishi. Your car is ready for launch.")
+- **Both Names** — Includes both your name and car name (e.g., "Hello Hrishi. Tesla is ready to run.")
+- **Random** — Randomly picks how you're greeted each drive
+
+**Test button integration:**
+- Preview text in TTS cards now respects the selected name mode
+
 ## v1.3 (2026-05-29)
 
 ### UI Redesign — Automotive Dark Theme
