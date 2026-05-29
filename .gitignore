@@ -27,6 +27,7 @@ app/debug/
 *.keystore
 *.ks
 key.properties
+keystore.properties
 
 # --- OS files ---
 .DS_Store

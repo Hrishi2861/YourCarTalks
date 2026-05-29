@@ -26,6 +26,16 @@ val OutfitTypography = Typography(
         fontWeight = FontWeight.Bold,
         fontSize = 22.sp,
     ),
+    headlineMedium = TextStyle(
+        fontFamily = Outfit,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+    ),
+    headlineSmall = TextStyle(
+        fontFamily = Outfit,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+    ),
     titleLarge = TextStyle(
         fontFamily = Outfit,
         fontWeight = FontWeight.SemiBold,

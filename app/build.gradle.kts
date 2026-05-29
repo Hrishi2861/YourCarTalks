@@ -1,7 +1,13 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
+
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+keystorePropertiesFile.takeIf { it.exists() }?.inputStream()?.use { keystoreProperties.load(it) }
 
 android {
     namespace = "com.hrishi.yourcartalks"
@@ -24,9 +30,23 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = keystorePropertiesFile.takeIf { it.exists() }?.let {
+                file(keystoreProperties.getProperty("storeFile", ""))
+            }
+            storePassword = keystoreProperties.getProperty("storePassword", "")
+            keyAlias = keystoreProperties.getProperty("keyAlias", "")
+            keyPassword = keystoreProperties.getProperty("keyPassword", "")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = if (keystorePropertiesFile.exists()) {
+                signingConfigs.getByName("release")
+            } else null
         }
     }
 

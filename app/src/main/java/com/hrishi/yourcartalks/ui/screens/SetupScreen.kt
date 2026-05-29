@@ -177,7 +177,8 @@ private fun CarNameStep(
 ) {
     Text(
         text = "Welcome!",
-        style = MaterialTheme.typography.headlineMedium
+        style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.onSurface
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
@@ -219,7 +220,8 @@ private fun DriverNameStep(
 ) {
     Text(
         text = "What's your name?",
-        style = MaterialTheme.typography.headlineMedium
+        style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.onSurface
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
@@ -260,7 +262,8 @@ private fun BatteryOptStep(
 ) {
     Text(
         text = "Disable Battery Optimization",
-        style = MaterialTheme.typography.headlineSmall
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
@@ -302,7 +305,8 @@ private fun AutoStartStep(
 ) {
     Text(
         text = "Enable Auto-Start",
-        style = MaterialTheme.typography.headlineSmall
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
@@ -345,7 +349,8 @@ private fun NotificationStep(
 ) {
     Text(
         text = "Notification Permission",
-        style = MaterialTheme.typography.headlineSmall
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
@@ -389,7 +394,8 @@ private fun BluetoothStep(
 ) {
     Text(
         text = "Bluetooth Permission",
-        style = MaterialTheme.typography.headlineSmall
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
@@ -433,7 +439,8 @@ private fun ThemeStep(
 ) {
     Text(
         text = "Choose Theme",
-        style = MaterialTheme.typography.headlineSmall
+        style = MaterialTheme.typography.headlineSmall,
+        color = MaterialTheme.colorScheme.onSurface
     )
     Spacer(modifier = Modifier.height(8.dp))
     Text(
@@ -462,7 +469,8 @@ private fun ThemeStep(
                         ThemeMode.LIGHT -> "Light"
                         ThemeMode.DARK -> "Dark"
                     },
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = when (mode) {
