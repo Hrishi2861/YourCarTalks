@@ -13,52 +13,59 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.hrishi.yourcartalks.data.ThemeMode
 
-private val DarkBackground = Color(0xFF121212)
-private val DarkSurface = Color(0xFF1E1E1E)
-private val DarkSurfaceVariant = Color(0xFF2C2C2C)
-private val DarkOnBackground = Color(0xFFE0E0E0)
-private val DarkOnSurface = Color(0xFFE0E0E0)
-private val DarkPrimary = Color(0xFF90CAF9)
-private val DarkOnPrimary = Color(0xFF003258)
-private val DarkSecondary = Color(0xFF80CBC4)
-private val DarkOnSecondary = Color(0xFF003733)
-private val DarkError = Color(0xFFEF9A9A)
+val DarkBackground = Color(0xFF0A0A0A)
+val DarkSurface = Color(0xFF111111)
+val DarkSurfaceVariant = Color(0xFF1F1F1F)
+val DarkPrimary = Color(0xFFE8A020)
+val DarkOnPrimary = Color(0xFF000000)
+val DarkOnBackground = Color(0xFFFFFFFF)
+val DarkOnSurface = Color(0xFFFFFFFF)
+val DarkOnSurfaceVariant = Color(0xFF9E9E9E)
+val DarkSecondary = Color(0xFF757575)
+val DarkOnSecondary = Color(0xFFFFFFFF)
+val DarkError = Color(0xFFCF4444)
+val DarkOutline = Color(0xFF1F1F1F)
+val DarkSuccess = Color(0xFF4CAF50)
 
-private val LightBackground = Color(0xFFF5F5F5)
-private val LightSurface = Color(0xFFFFFFFF)
-private val LightSurfaceVariant = Color(0xFFE8E8E8)
-private val LightOnBackground = Color(0xFF1C1B1F)
-private val LightOnSurface = Color(0xFF1C1B1F)
-private val LightPrimary = Color(0xFF1565C0)
-private val LightOnPrimary = Color(0xFFFFFFFF)
-private val LightSecondary = Color(0xFF00796B)
-private val LightOnSecondary = Color(0xFFFFFFFF)
-private val LightError = Color(0xFFD32F2F)
+val LightBackground = Color(0xFFF5F5F0)
+val LightSurface = Color(0xFFFFFFFF)
+val LightSurfaceVariant = Color(0xFFE8E8E8)
+val LightPrimary = Color(0xFFE8A020)
+val LightOnPrimary = Color(0xFFFFFFFF)
+val LightOnBackground = Color(0xFF1A1A1A)
+val LightOnSurface = Color(0xFF1A1A1A)
+val LightOnSurfaceVariant = Color(0xFF757575)
+val LightSecondary = Color(0xFF757575)
+val LightOnSecondary = Color(0xFFFFFFFF)
+val LightError = Color(0xFFCF4444)
+val LightOutline = Color(0xFFE0E0E0)
 
 private val DarkColorScheme = darkColorScheme(
     background = DarkBackground,
     surface = DarkSurface,
     surfaceVariant = DarkSurfaceVariant,
-    onBackground = DarkOnBackground,
-    onSurface = DarkOnSurface,
     primary = DarkPrimary,
     onPrimary = DarkOnPrimary,
+    onBackground = DarkOnBackground,
+    onSurface = DarkOnSurface,
     secondary = DarkSecondary,
     onSecondary = DarkOnSecondary,
     error = DarkError,
+    outline = DarkOutline,
 )
 
 private val LightColorScheme = lightColorScheme(
     background = LightBackground,
     surface = LightSurface,
     surfaceVariant = LightSurfaceVariant,
-    onBackground = LightOnBackground,
-    onSurface = LightOnSurface,
     primary = LightPrimary,
     onPrimary = LightOnPrimary,
+    onBackground = LightOnBackground,
+    onSurface = LightOnSurface,
     secondary = LightSecondary,
     onSecondary = LightOnSecondary,
     error = LightError,
+    outline = LightOutline,
 )
 
 @Composable
@@ -85,6 +92,14 @@ fun YourCarTalksTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
+        typography = OutfitTypography,
         content = content
     )
+}
+
+object AutoColors {
+    val selectedBg: Color get() = Color(0x1AE8A020)
+    val success: Color get() = Color(0xFF4CAF50)
+    val destructive: Color get() = Color(0xFFCF4444)
+    val pageDotInactive: Color get() = Color(0xFF2C2C2C)
 }

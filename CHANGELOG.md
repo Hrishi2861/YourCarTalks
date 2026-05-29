@@ -1,5 +1,59 @@
 # Changelog
 
+## v1.3 (2026-05-29)
+
+### UI Redesign — Automotive Dark Theme
+
+**Typography:**
+- Added Outfit font family (Regular, Medium, SemiBold, Bold) via res/font/
+- All text now uses Outfit with custom sizes and weights
+- Screen title: Outfit Bold 26sp, headers: Outfit SemiBold 13sp caps, values: Outfit Bold 22sp
+
+**Color System:**
+- Dark mode: background #0A0A0A, surface #111111, card border #1F1F1F, amber accent #E8A020
+- Light mode: background #F5F5F0, surface #FFFFFF, card border #E0E0E0, amber accent #E8A020
+- Custom color tokens for selected state (10% amber), success green, destructive red
+
+**New Header:**
+- Custom Canvas-drawn sedan silhouette icon + "YourCarTalks" title + green "ACTIVE" status pill
+- Top gradient overlay (#E8A02008 to transparent, 120dp)
+
+**Name Cards Redesign:**
+- Dark surface cards with 14dp corner radius, icon + label/value column + pencil edit button
+- Custom Canvas icons: key (car name), person (driver name), pencil (edit)
+- Inline editing with text field
+
+**TTS Engine Selector:**
+- Radio buttons replaced with full-width selectable cards
+- Selected state: amber 10% background, 1.5dp amber border
+- Each card shows radio indicator, label, subtitle, and amber outlined TEST pill
+- Test button only visible when model is downloaded
+
+**Model Download Cards:**
+- Full-width download button with amber background, custom Canvas download icon
+- LinearProgressIndicator replaces button during download
+- "DOWNLOADED" badge pill when complete
+
+**Greeting Style Pager:**
+- HorizontalPager with swipeable message previews
+- Left/right arrow navigation with dot indicators
+- 21 options: "Random (default)" + 20 greeting messages
+- "Tap arrows to preview" hint text
+
+**Theme Segmented Control:**
+- 3-button row (Light/Dark/System) with custom Canvas icons (sun, moon, split circle)
+- Selected segment: amber background with black text and icon
+
+**Service Status Banner:**
+- Compact horizontal banner with shield icon + checkmark + status text
+- Animated pulsing green dot (scale animation 1f → 1.4f, 1000ms)
+- Two-circle pulse ring effect
+
+**Layout Changes:**
+- LazyColumn for entire settings screen
+- 12dp spacing between sections, 16dp horizontal padding
+- Screen background follows theme color
+
 ## v1.2 (2026-05-29)
 
 ### Greeting Messages & Driver Name

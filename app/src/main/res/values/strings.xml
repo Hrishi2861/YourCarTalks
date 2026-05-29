@@ -20,7 +20,6 @@
     <string name="service_channel_name">YourCarTalks Service</string>
     <string name="service_channel_desc">Ongoing notification for Android Auto greeting service</string>
     <string name="service_notification_text">Waiting for Android Auto connection…</string>
-    <string name="greeting_template">Welcome to Your %s</string>
     <string name="settings_title">YourCarTalks Settings</string>
     <string name="car_name_summary">Your car is called</string>
     <string name="save">Save</string>
